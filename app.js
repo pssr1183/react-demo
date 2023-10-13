@@ -1,41 +1,54 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors'); // Import the cors package.
+const cors = require('cors');
 
-
-
-// Middleware for enabling CORS
 const app = express();
-const port = 5000; // You can change this to any port you prefer.
-app.use(cors());
+const port = 3001;
 
-// Middleware for parsing JSON requests
+app.use(cors());
 app.use(bodyParser.json());
 
-// Data storage (an array of student objects)
 const students = [
-    { rollNumber: '101', name: 'John Doe', marks: 85 },
-  { rollNumber: '102', name: 'Jane Smith', marks: 92 },
-  { rollNumber: '103', name: 'Bob Johnson', marks: 78 },
-];
+  {rollnum:101,name:"Jaswanth",marks:35},
+  {rollnum:102,name:"RVV",marks:55},
+  {rollnum:103,name:"Chai Krishna",marks:75},
+  {rollnum:104,name:"Pooooo bro",marks:95},
 
-// Endpoint to retrieve a student's marks by roll number
-app.get('/students/:rollNumber', (req, res) => {
-  const rollNumber = req.params.rollNumber;
-  const student = students.find((s) => s.rollNumber === rollNumber);
+]; // Array to store student data
 
-  if (student) {
-    console.log(student);
-    res.json(student);
-} else {
-    res.status(404).json({ error: 'Student not found' });
+app.get('/getmarks/:rollNum',(req,res)=>{
+  const roll = req.params.rollNum;
+  const student = students.find((student)=>student.rollnum===parseInt(roll));
+  if(student){
+    res.status(201).json({marks:student.marks});
+  }
+  else{
+    res.status(404).json({error:"Student not found"})
   }
 });
-
-
-// Endpoint to add a student and their marks
-
+// Endpoint to add a new student
+app.post('/addmarks',(req,res)=>{
+  const {rollNum,fullName,marks}= req.body;
+  if(!rollNum||!fullName||!marks){
+     res.status(403).json({
+        error:'Please fill all'
+    
+  })
+}
+    else{
+     const obj={
+    rollnum:rollNum,
+    name:fullName,
+    marks:marks
+  }
+  students.push(obj);
+  res.status(201).json({
+    msg:'Stored Sucessfully'
+      })
+    }
+})
+console.log(students);
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server listening on port ${port}`);
 });
